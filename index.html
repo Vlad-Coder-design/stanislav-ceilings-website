@@ -104,14 +104,21 @@
   nav.mainnav a:hover::after{width:100%;}
   .head-actions{display:flex;align-items:center;gap:14px;}
   .music-mixer{
+    --volume:45%;
+    --elastic:0;
     display:flex;
     align-items:center;
     gap:9px;
-    min-width:176px;
+    min-width:210px;
     padding:7px 10px;
     border:1.5px solid var(--line);
     border-radius:999px;
     background:rgba(246,247,247,.68);
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .music-mixer.is-sliding{
+    border-color:rgba(231,163,59,.72);
+    box-shadow:0 10px 24px rgba(199,132,42,.16);
   }
   .music-toggle{
     width:30px;
@@ -132,9 +139,80 @@
     font-weight:800;
     color:var(--graphite-700);
   }
+  .volume-wrap{
+    position:relative;
+    width:84px;
+    height:30px;
+    display:flex;
+    align-items:center;
+    isolation:isolate;
+  }
+  .volume-bubble{
+    position:absolute;
+    left:var(--volume);
+    top:-22px;
+    transform:translateX(-50%) translateY(calc(var(--elastic) * -4px)) scale(calc(.88 + var(--elastic) * .12));
+    min-width:30px;
+    padding:2px 6px;
+    border-radius:999px;
+    background:var(--graphite-900);
+    color:var(--concrete-50);
+    font-size:10px;
+    font-weight:800;
+    text-align:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .16s ease, transform .18s cubic-bezier(.2,1.8,.35,1);
+  }
+  .music-mixer.is-sliding .volume-bubble,
+  .music-mixer:focus-within .volume-bubble{
+    opacity:1;
+  }
   .music-volume{
-    width:70px;
-    accent-color:var(--amber-600);
+    width:100%;
+    height:30px;
+    margin:0;
+    appearance:none;
+    -webkit-appearance:none;
+    background:transparent;
+    cursor:pointer;
+  }
+  .music-volume:focus{outline:none;}
+  .music-volume::-webkit-slider-runnable-track{
+    height:calc(6px + var(--elastic) * 6px);
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--amber-500) 0 var(--volume),var(--line) var(--volume) 100%);
+    box-shadow:inset 0 0 0 1px rgba(27,33,36,.05);
+    transition:height .18s cubic-bezier(.2,1.8,.35,1);
+  }
+  .music-volume::-webkit-slider-thumb{
+    appearance:none;
+    -webkit-appearance:none;
+    width:18px;
+    height:18px;
+    margin-top:calc(-6px - var(--elastic) * 3px);
+    border-radius:50%;
+    border:3px solid var(--panel);
+    background:var(--amber-600);
+    box-shadow:0 4px 12px rgba(199,132,42,.35);
+    transform:scale(calc(1 + var(--elastic) * .28));
+    transition:transform .18s cubic-bezier(.2,1.8,.35,1), margin-top .18s cubic-bezier(.2,1.8,.35,1);
+  }
+  .music-volume::-moz-range-track{
+    height:calc(6px + var(--elastic) * 6px);
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--amber-500) 0 var(--volume),var(--line) var(--volume) 100%);
+    transition:height .18s cubic-bezier(.2,1.8,.35,1);
+  }
+  .music-volume::-moz-range-thumb{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    border:3px solid var(--panel);
+    background:var(--amber-600);
+    box-shadow:0 4px 12px rgba(199,132,42,.35);
+    transform:scale(calc(1 + var(--elastic) * .28));
+    transition:transform .18s cubic-bezier(.2,1.8,.35,1);
   }
   .youtube-player{
     position:absolute;
@@ -178,13 +256,14 @@
     .burger{display:block;}
   }
   @media (max-width:1040px){
-    .music-mixer{min-width:118px;}
+    .music-mixer{min-width:146px;}
     .music-label{display:none;}
-    .music-volume{width:58px;}
+    .volume-wrap{width:72px;}
   }
   @media (max-width:430px){
     .music-mixer{min-width:82px;padding:6px 8px;gap:6px;}
-    .music-volume{width:42px;}
+    .volume-wrap{width:42px;}
+    .volume-bubble{display:none;}
   }
 
   /* ---------- HERO ---------- */
@@ -506,7 +585,10 @@
       <div class="music-mixer" aria-label="Музичний плеєр">
         <button class="music-toggle" id="musicToggle" type="button" aria-label="Увімкнути музику" aria-pressed="false">▶</button>
         <label class="music-label" for="musicVolume">Музика</label>
-        <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="45" aria-label="Гучність музики">
+        <div class="volume-wrap">
+          <span class="volume-bubble" id="musicVolumeValue" aria-hidden="true">45</span>
+          <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="45" aria-label="Гучність музики">
+        </div>
       </div>
       <a class="btn btn-ghost btn-ghost-desktop" href="tel:+380662375587">+380 66 237 55 87</a>
       <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false">
@@ -752,8 +834,10 @@
 
 <script>
   // Header music player
+  const musicMixer = document.querySelector('.music-mixer');
   const musicToggle = document.getElementById('musicToggle');
   const musicVolume = document.getElementById('musicVolume');
+  const musicVolumeValue = document.getElementById('musicVolumeValue');
   const youtubeFrame = document.getElementById('youtubeFrame');
   let musicPlaying = false;
 
@@ -777,6 +861,19 @@
     }), 'https://www.youtube.com');
   };
 
+  const updateVolumeUi = () => {
+    if (!musicMixer || !musicVolume) return;
+    const volume = Number(musicVolume.value);
+    musicMixer.style.setProperty('--volume', `${volume}%`);
+    if (musicVolumeValue) musicVolumeValue.textContent = String(volume);
+  };
+
+  const setElasticState = (active) => {
+    if (!musicMixer) return;
+    musicMixer.classList.toggle('is-sliding', active);
+    musicMixer.style.setProperty('--elastic', active ? '1' : '0');
+  };
+
   if (musicToggle) {
     musicToggle.addEventListener('click', () => {
       musicPlaying = !musicPlaying;
@@ -786,7 +883,15 @@
   }
 
   if (musicVolume) {
+    updateVolumeUi();
+    ['pointerdown', 'touchstart', 'mousedown'].forEach((eventName) => {
+      musicVolume.addEventListener(eventName, () => setElasticState(true));
+    });
+    ['pointerup', 'pointercancel', 'touchend', 'mouseup', 'mouseleave', 'blur'].forEach((eventName) => {
+      musicVolume.addEventListener(eventName, () => setElasticState(false));
+    });
     musicVolume.addEventListener('input', () => {
+      updateVolumeUi();
       sendYouTubeCommand('setVolume', [Number(musicVolume.value)]);
     });
   }
