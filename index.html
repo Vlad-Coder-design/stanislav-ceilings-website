@@ -226,6 +226,41 @@
     height:1px;
     border:0;
   }
+  .music-consent{
+    position:fixed;
+    inset:0;
+    z-index:120;
+    display:grid;
+    place-items:center;
+    padding:24px;
+    background:rgba(18,24,27,.48);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s ease;
+  }
+  .music-consent.is-visible{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .music-consent-card{
+    width:min(100%,390px);
+    padding:24px;
+    border:1px solid rgba(207,211,211,.9);
+    border-radius:12px;
+    background:var(--panel);
+    box-shadow:0 24px 70px rgba(18,24,27,.24);
+  }
+  .music-consent-card p{
+    margin:0 0 18px;
+    font-size:18px;
+    font-weight:800;
+    color:var(--graphite-900);
+  }
+  .music-consent-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
   .btn{
     display:inline-flex;align-items:center;gap:8px;
     font-family:'Manrope',sans-serif;font-weight:700;font-size:14.5px;
@@ -601,6 +636,16 @@
   </div>
 </header>
 
+<div class="music-consent" id="musicConsent" role="dialog" aria-modal="true" aria-labelledby="musicConsentTitle" hidden>
+  <div class="music-consent-card">
+    <p id="musicConsentTitle">Would you like to play music?</p>
+    <div class="music-consent-actions">
+      <button class="btn btn-primary" id="musicConsentYes" type="button">Yes</button>
+      <button class="btn btn-line" id="musicConsentNo" type="button">No</button>
+    </div>
+  </div>
+</div>
+
 <main>
 
   <!-- HERO -->
@@ -838,8 +883,29 @@
   const musicToggle = document.getElementById('musicToggle');
   const musicVolume = document.getElementById('musicVolume');
   const musicVolumeValue = document.getElementById('musicVolumeValue');
+  const musicConsent = document.getElementById('musicConsent');
+  const musicConsentYes = document.getElementById('musicConsentYes');
+  const musicConsentNo = document.getElementById('musicConsentNo');
   const youtubeFrame = document.getElementById('youtubeFrame');
   let musicPlaying = false;
+  let youtubeReady = false;
+  const musicStorageKey = 'musicPromptAnswered';
+
+  const getMusicPromptAnswer = () => {
+    try {
+      return localStorage.getItem(musicStorageKey);
+    } catch {
+      return null;
+    }
+  };
+
+  const setMusicPromptAnswer = (answer) => {
+    try {
+      localStorage.setItem(musicStorageKey, answer);
+    } catch {
+      // Private browsing can block storage; the prompt still works for this visit.
+    }
+  };
 
   if (youtubeFrame) {
     youtubeFrame.src = `https://www.youtube.com/embed/EaUQbQ2PL-4?enablejsapi=1&playsinline=1&controls=0&rel=0&origin=${encodeURIComponent(window.location.origin)}`;
@@ -861,6 +927,22 @@
     }), 'https://www.youtube.com');
   };
 
+  const playMusic = () => {
+    musicPlaying = true;
+    updateMusicButton();
+    sendYouTubeCommand('setVolume', [Number(musicVolume?.value || 45)]);
+    sendYouTubeCommand('playVideo');
+    if (!youtubeReady) {
+      window.setTimeout(() => sendYouTubeCommand('playVideo'), 450);
+    }
+  };
+
+  const pauseMusic = () => {
+    musicPlaying = false;
+    updateMusicButton();
+    sendYouTubeCommand('pauseVideo');
+  };
+
   const updateVolumeUi = () => {
     if (!musicMixer || !musicVolume) return;
     const volume = Number(musicVolume.value);
@@ -874,11 +956,30 @@
     musicMixer.style.setProperty('--elastic', active ? '1' : '0');
   };
 
+  const closeMusicConsent = () => {
+    if (!musicConsent) return;
+    musicConsent.classList.remove('is-visible');
+    window.setTimeout(() => {
+      musicConsent.hidden = true;
+    }, 220);
+  };
+
+  const showMusicConsent = () => {
+    if (!musicConsent) return;
+    musicConsent.hidden = false;
+    window.requestAnimationFrame(() => {
+      musicConsent.classList.add('is-visible');
+      musicConsentYes?.focus();
+    });
+  };
+
   if (musicToggle) {
     musicToggle.addEventListener('click', () => {
-      musicPlaying = !musicPlaying;
-      updateMusicButton();
-      sendYouTubeCommand(musicPlaying ? 'playVideo' : 'pauseVideo');
+      if (musicPlaying) {
+        pauseMusic();
+      } else {
+        playMusic();
+      }
     });
   }
 
@@ -898,8 +999,37 @@
 
   if (youtubeFrame) {
     youtubeFrame.addEventListener('load', () => {
+      youtubeReady = true;
       sendYouTubeCommand('setVolume', [Number(musicVolume?.value || 45)]);
     });
+  }
+
+  if (musicConsentYes) {
+    musicConsentYes.addEventListener('click', () => {
+      setMusicPromptAnswer('yes');
+      closeMusicConsent();
+      playMusic();
+    });
+  }
+
+  if (musicConsentNo) {
+    musicConsentNo.addEventListener('click', () => {
+      setMusicPromptAnswer('no');
+      closeMusicConsent();
+    });
+  }
+
+  if (musicConsent) {
+    musicConsent.addEventListener('click', (event) => {
+      if (event.target === musicConsent) {
+        setMusicPromptAnswer('no');
+        closeMusicConsent();
+      }
+    });
+  }
+
+  if (!getMusicPromptAnswer()) {
+    window.setTimeout(showMusicConsent, 650);
   }
 
   // Mobile nav toggle
