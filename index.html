@@ -143,6 +143,11 @@
     left:-9999px;
     overflow:hidden;
   }
+  .youtube-player iframe{
+    width:1px;
+    height:1px;
+    border:0;
+  }
   .btn{
     display:inline-flex;align-items:center;gap:8px;
     font-family:'Manrope',sans-serif;font-weight:700;font-size:14.5px;
@@ -509,7 +514,9 @@
       </button>
     </div>
   </div>
-  <div class="youtube-player" id="youtubePlayer" aria-hidden="true"></div>
+  <div class="youtube-player" id="youtubePlayer" aria-hidden="true">
+    <iframe id="youtubeFrame" title="Фонова музика" allow="autoplay; encrypted-media"></iframe>
+  </div>
 </header>
 
 <main>
@@ -747,10 +754,12 @@
   // Header music player
   const musicToggle = document.getElementById('musicToggle');
   const musicVolume = document.getElementById('musicVolume');
-  let musicPlayer;
-  let musicPlayerReady = false;
-  let musicShouldPlay = false;
+  const youtubeFrame = document.getElementById('youtubeFrame');
   let musicPlaying = false;
+
+  if (youtubeFrame) {
+    youtubeFrame.src = `https://www.youtube.com/embed/EaUQbQ2PL-4?enablejsapi=1&playsinline=1&controls=0&rel=0&origin=${encodeURIComponent(window.location.origin)}`;
+  }
 
   const updateMusicButton = () => {
     if (!musicToggle) return;
@@ -759,58 +768,34 @@
     musicToggle.setAttribute('aria-label', musicPlaying ? 'Вимкнути музику' : 'Увімкнути музику');
   };
 
-  window.onYouTubeIframeAPIReady = () => {
-    musicPlayer = new YT.Player('youtubePlayer', {
-      videoId: 'EaUQbQ2PL-4',
-      width: 1,
-      height: 1,
-      playerVars: {
-        controls: 0,
-        disablekb: 1,
-        modestbranding: 1,
-        playsinline: 1,
-        rel: 0,
-      },
-      events: {
-        onReady: () => {
-          musicPlayerReady = true;
-          musicPlayer.setVolume(Number(musicVolume?.value || 45));
-          if (musicShouldPlay) musicPlayer.playVideo();
-        },
-        onStateChange: (event) => {
-          musicPlaying = event.data === YT.PlayerState.PLAYING;
-          updateMusicButton();
-        },
-      },
-    });
+  const sendYouTubeCommand = (func, args = []) => {
+    if (!youtubeFrame?.contentWindow) return;
+    youtubeFrame.contentWindow.postMessage(JSON.stringify({
+      event: 'command',
+      func,
+      args,
+    }), 'https://www.youtube.com');
   };
 
   if (musicToggle) {
     musicToggle.addEventListener('click', () => {
-      musicShouldPlay = !musicPlaying;
-      if (!musicPlayerReady || !musicPlayer) {
-        musicToggle.textContent = '…';
-        return;
-      }
-      if (musicPlaying) {
-        musicPlayer.pauseVideo();
-      } else {
-        musicPlayer.playVideo();
-      }
+      musicPlaying = !musicPlaying;
+      updateMusicButton();
+      sendYouTubeCommand(musicPlaying ? 'playVideo' : 'pauseVideo');
     });
   }
 
   if (musicVolume) {
     musicVolume.addEventListener('input', () => {
-      if (musicPlayerReady && musicPlayer) {
-        musicPlayer.setVolume(Number(musicVolume.value));
-      }
+      sendYouTubeCommand('setVolume', [Number(musicVolume.value)]);
     });
   }
 
-  const youtubeApi = document.createElement('script');
-  youtubeApi.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(youtubeApi);
+  if (youtubeFrame) {
+    youtubeFrame.addEventListener('load', () => {
+      sendYouTubeCommand('setVolume', [Number(musicVolume?.value || 45)]);
+    });
+  }
 
   // Mobile nav toggle
   const burger = document.getElementById('burgerBtn');
