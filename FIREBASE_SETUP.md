@@ -7,6 +7,7 @@ This static site uses Firebase Auth + Firebase Storage for the public gallery.
 1. Create a Firebase project.
 2. Enable Authentication and add the Google provider.
 3. Enable Firebase Storage.
+   - If Firebase shows "To use Storage, upgrade your project's pricing plan", upgrade to Blaze before continuing. Google currently blocks Storage setup on this project while it remains on Spark.
 4. Add this site domain to Authentication > Settings > Authorized domains:
    - your Vercel production domain
    - your Vercel preview domain if you want to test uploads there
