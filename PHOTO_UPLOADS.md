@@ -1,25 +1,30 @@
-# Free Photo Gallery Workflow
+# Website Photo Uploads
 
-The website gallery is free: it reads public image files from this GitHub folder:
+The gallery reads public image files from this GitHub folder:
 
 `assets/projects/`
 
-## Add Photos
+## How Uploads Work
 
-1. Open the GitHub repository.
-2. Go to `assets/projects/`.
-3. Click **Add file** -> **Upload files**.
-4. Upload `.jpg`, `.jpeg`, `.png`, `.webp`, `.gif`, or `.avif` images.
-5. Commit the upload to `main`.
+Visitors can view photos. The upload form on the website sends a resized photo to `/api/upload-photo`, and that Vercel function commits it into `assets/projects/`.
 
-Vercel will redeploy automatically, and the website will show the images.
+The upload form needs two Vercel environment variables:
 
-## Permissions
+- `GITHUB_UPLOAD_TOKEN`: a fine-grained GitHub token with **Contents: Read and write** access for this repository.
+- `UPLOAD_CODE`: a private code shared only with the person allowed to upload photos.
 
-Only GitHub users with write access to the repository can add photos.
+After setting or changing environment variables, redeploy the site.
 
-Invite `petrostanislav@gmail.com` to the repository as a collaborator with write access. After he accepts the GitHub invitation, he can use the **Додати фото** button on the live website to open the upload page.
+## How To Add Photos
 
-Everyone can view the published photos on the website.
+1. Open the live website.
+2. Click **Додати фото**.
+3. Enter the private upload code.
+4. Choose a photo.
+5. Click **Завантажити**.
 
-No Firebase Storage, Blaze plan, or paid backend is required.
+The website compresses the image before upload, commits it to GitHub, and refreshes the gallery.
+
+## Access Control
+
+Only someone who knows `UPLOAD_CODE` can use the website upload form. Keep the GitHub token private in Vercel; never put it into `index.html`.

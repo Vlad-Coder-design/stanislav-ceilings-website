@@ -316,6 +316,45 @@
     justify-content:flex-end;
     flex-shrink:0;
   }
+  .upload-panel{
+    display:none;
+    margin:-4px 0 22px;
+    padding:18px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    background:var(--concrete-50);
+  }
+  .upload-panel.open{display:block;}
+  .upload-form{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:12px;
+    align-items:end;
+  }
+  .upload-field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:var(--steel-600);
+    margin-bottom:6px;
+  }
+  .upload-field input{
+    width:100%;
+    min-height:44px;
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    background:#fff;
+    color:var(--graphite-900);
+    font:inherit;
+    padding:9px 11px;
+  }
+  .upload-status{
+    margin:12px 0 0;
+    color:var(--steel-600);
+    font-size:14px;
+  }
+  .upload-status.error{color:#9B2C2C;}
+  .upload-status.success{color:#276749;}
   .gallery-grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -342,6 +381,7 @@
   @media (max-width:760px){
     .gallery-head{display:block;}
     .gallery-actions{justify-content:flex-start;margin-top:14px;}
+    .upload-form{grid-template-columns:1fr;}
     .gallery-grid{grid-template-columns:repeat(2,1fr);}
   }
   @media (max-width:460px){ .gallery-grid{grid-template-columns:1fr;} }
@@ -575,11 +615,26 @@
         <div class="gallery-head">
           <div>
             <h3>Фото останніх об'єктів</h3>
-            <p>Усі відвідувачі бачать опубліковані роботи. Фото додаються безкоштовно через GitHub.</p>
+            <p>Усі відвідувачі бачать опубліковані роботи. Додавати фото може тільки майстер.</p>
           </div>
           <div class="gallery-actions">
-            <a class="btn btn-line" href="https://github.com/Vlad-Coder-design/stanislav-ceilings-website/upload/main/assets/projects" target="_blank" rel="noopener">Додати фото</a>
+            <button class="btn btn-line" type="button" id="showUploadBtn" aria-expanded="false" aria-controls="uploadPanel">Додати фото</button>
           </div>
+        </div>
+
+        <div class="upload-panel" id="uploadPanel">
+          <form class="upload-form" id="uploadForm">
+            <div class="upload-field">
+              <label for="uploadCode">Код доступу</label>
+              <input id="uploadCode" name="code" type="password" autocomplete="current-password" required>
+            </div>
+            <div class="upload-field">
+              <label for="photoFile">Фото</label>
+              <input id="photoFile" name="photo" type="file" accept="image/*" required>
+            </div>
+            <button class="btn btn-primary" type="submit">Завантажити</button>
+          </form>
+          <p class="upload-status" id="uploadStatus">Фото буде стиснено для сайту й додано в галерею після публікації.</p>
         </div>
 
         <div class="gallery-grid" id="projectGallery">
@@ -674,6 +729,10 @@
 
 <script>
   const gallery = document.getElementById('projectGallery');
+  const showUploadBtn = document.getElementById('showUploadBtn');
+  const uploadPanel = document.getElementById('uploadPanel');
+  const uploadForm = document.getElementById('uploadForm');
+  const uploadStatus = document.getElementById('uploadStatus');
   const galleryApiUrl = 'https://api.github.com/repos/Vlad-Coder-design/stanislav-ceilings-website/contents/assets/projects';
   const imagePattern = /\.(avif|gif|jpe?g|png|webp)$/i;
 
@@ -709,6 +768,91 @@
       renderEmpty('Не вдалося завантажити фото з GitHub. Спробуйте оновити сторінку.');
     }
   };
+
+  const setUploadStatus = (message, type = '') => {
+    if (!uploadStatus) return;
+    uploadStatus.textContent = message;
+    uploadStatus.className = `upload-status${type ? ` ${type}` : ''}`;
+  };
+
+  const slugify = (value) => value
+    .toLowerCase()
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'project-photo';
+
+  const resizeImage = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Не вдалося прочитати файл.'));
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => reject(new Error('Оберіть коректний файл зображення.'));
+      image.onload = () => {
+        const maxSide = 1800;
+        const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+        const width = Math.max(1, Math.round(image.width * scale));
+        const height = Math.max(1, Math.round(image.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.84);
+        resolve({
+          filename: `${new Date().toISOString().slice(0, 10)}-${Date.now()}-${slugify(file.name)}.jpg`,
+          contentBase64: dataUrl.split(',')[1],
+        });
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  if (showUploadBtn && uploadPanel) {
+    showUploadBtn.addEventListener('click', () => {
+      const open = uploadPanel.classList.toggle('open');
+      showUploadBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) document.getElementById('uploadCode')?.focus();
+    });
+  }
+
+  if (uploadForm) {
+    uploadForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const submitButton = uploadForm.querySelector('button[type="submit"]');
+      const code = document.getElementById('uploadCode')?.value.trim();
+      const file = document.getElementById('photoFile')?.files?.[0];
+
+      if (!code || !file) {
+        setUploadStatus('Введіть код доступу й оберіть фото.', 'error');
+        return;
+      }
+
+      try {
+        submitButton.disabled = true;
+        setUploadStatus('Готую фото до завантаження...');
+        const image = await resizeImage(file);
+        setUploadStatus('Завантажую фото на сайт...');
+
+        const response = await fetch('/api/upload-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, ...image }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Не вдалося завантажити фото.');
+
+        uploadForm.reset();
+        setUploadStatus('Фото додано. Воно зʼявиться після оновлення галереї.', 'success');
+        setTimeout(loadGallery, 2500);
+      } catch (error) {
+        setUploadStatus(error.message || 'Не вдалося завантажити фото.', 'error');
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+  }
 
   loadGallery();
 </script>
