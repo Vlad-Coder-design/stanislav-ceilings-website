@@ -1,0 +1,853 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Майстер Стель — грильято, армстронг, кубічні рейки</title>
+<meta name="description" content="Монтаж підвісних стель грильято, армстронг та кубічних реєчних систем у Києві та області. Замір, розрахунок, встановлення.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --concrete-50:#EEF0F0;
+    --concrete-100:#E1E4E4;
+    --panel:#F6F7F7;
+    --graphite-900:#1B2124;
+    --graphite-700:#2A3236;
+    --steel-600:#55666E;
+    --steel-400:#8A979D;
+    --aluminium-400:#A6ADB2;
+    --amber-500:#E7A33B;
+    --amber-600:#C8842A;
+    --duct-bg:#12181B;
+    --line:#CFD3D3;
+    --radius:14px;
+    --maxw:1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--concrete-50);
+    color:var(--graphite-900);
+    font-family:'Manrope',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+  h1,h2,h3{font-family:'Unbounded',sans-serif;line-height:1.15;margin:0;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--amber-600);
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px;height:1.5px;background:var(--amber-500);display:inline-block;
+  }
+  section{padding:88px 0;}
+  @media (max-width:720px){ section{padding:56px 0;} }
+
+  /* Focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:2.5px solid var(--amber-500);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(238,240,240,.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .headbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 0;
+  }
+  .logo{
+    font-family:'Unbounded',sans-serif;
+    font-weight:700;
+    font-size:16.5px;
+    letter-spacing:.01em;
+    display:flex;flex-direction:column;gap:2px;
+  }
+  .logo small{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:400;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    color:var(--steel-600);
+    text-transform:uppercase;
+  }
+  nav.mainnav{display:flex;align-items:center;gap:30px;}
+  nav.mainnav a{
+    font-size:14.5px;font-weight:600;text-decoration:none;color:var(--graphite-700);
+    position:relative;
+  }
+  nav.mainnav a::after{
+    content:"";position:absolute;left:0;bottom:-5px;height:2px;width:0;background:var(--amber-500);
+    transition:width .25s ease;
+  }
+  nav.mainnav a:hover::after{width:100%;}
+  .head-actions{display:flex;align-items:center;gap:14px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:14.5px;
+    padding:11px 20px;border-radius:999px;
+    text-decoration:none;cursor:pointer;border:none;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn-primary{background:var(--amber-500);color:var(--graphite-900);}
+  .btn-primary:hover{background:var(--amber-600);transform:translateY(-1px);box-shadow:0 8px 18px rgba(199,132,42,.35);}
+  .btn-ghost{background:transparent;color:var(--graphite-900);border:1.5px solid var(--graphite-900);}
+  .btn-ghost:hover{background:var(--graphite-900);color:var(--concrete-50);}
+  .btn-line{background:transparent;color:var(--graphite-700);border:1.5px solid var(--line);}
+  .btn-line:hover{border-color:var(--graphite-900);}
+
+  .burger{display:none;background:none;border:none;cursor:pointer;padding:8px;}
+  .burger span{display:block;width:24px;height:2px;background:var(--graphite-900);margin:5px 0;transition:.25s;}
+
+  @media (max-width:860px){
+    nav.mainnav{
+      position:fixed;inset:64px 0 0 0;background:var(--concrete-50);
+      flex-direction:column;align-items:flex-start;padding:32px 24px;gap:22px;
+      transform:translateY(-110%);opacity:0;transition:.3s ease;
+      border-bottom:1px solid var(--line);
+    }
+    nav.mainnav.open{transform:translateY(0);opacity:1;}
+    nav.mainnav a{font-size:19px;}
+    .head-actions .btn-ghost-desktop{display:none;}
+    .burger{display:block;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:64px 0 40px;
+  }
+  .hero-grid{
+    display:grid;grid-template-columns:1.15fr 1fr;gap:56px;align-items:center;
+  }
+  @media (max-width:900px){ .hero-grid{grid-template-columns:1fr;gap:40px;} }
+
+  .hero h1{
+    font-size:clamp(34px,5.4vw,58px);
+    font-weight:700;
+    letter-spacing:-.01em;
+    margin-bottom:20px;
+  }
+  .hero h1 em{
+    font-style:normal;color:var(--amber-600);
+  }
+  .hero p.lead{
+    font-size:18px;color:var(--steel-600);max-width:46ch;margin:0 0 30px;
+  }
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px;}
+  .hero-stat{
+    display:flex;align-items:center;gap:10px;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--steel-600);
+  }
+  .hero-stat .dot{width:7px;height:7px;border-radius:50%;background:var(--amber-500);}
+  .proof-row{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+    margin-top:32px;max-width:620px;
+  }
+  .proof-item{
+    border-top:1px solid var(--line);
+    padding-top:12px;
+  }
+  .proof-item strong{
+    display:block;
+    font-family:'Unbounded',sans-serif;
+    font-size:18px;
+    line-height:1.1;
+    margin-bottom:5px;
+  }
+  .proof-item span{display:block;color:var(--steel-600);font-size:13.5px;}
+  @media (max-width:560px){ .proof-row{grid-template-columns:1fr;} }
+
+  /* Ceiling sample panel */
+  .sample-frame{
+    background:var(--duct-bg);
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow:0 30px 60px -20px rgba(18,24,27,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .sample-grid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:5px;
+    perspective:900px;
+  }
+  .cell{position:relative;aspect-ratio:1;}
+  .cell .below{
+    position:absolute;inset:0;border-radius:2px;overflow:hidden;background:var(--duct-bg);
+  }
+  .cell .below svg{width:100%;height:100%;}
+  .cell .tile{
+    position:absolute;inset:0;border-radius:2px;
+    background:linear-gradient(150deg,#F5F6F6,#D9DCDC 65%,#CBCECE);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.18);
+    transition:transform .38s cubic-bezier(.2,.8,.2,1), box-shadow .38s ease;
+    animation:drop .55s cubic-bezier(.2,.8,.2,1) both;
+    cursor:pointer;
+  }
+  .cell.has-light .tile::after{
+    content:"";position:absolute;inset:32%;border-radius:50%;
+    background:var(--amber-500);
+    box-shadow:0 0 10px 3px rgba(231,163,59,.55);
+  }
+  .cell:hover .tile, .cell:focus-within .tile{
+    transform:translateY(-11px) scale(.92);
+    box-shadow:0 18px 22px -6px rgba(0,0,0,.4);
+  }
+  @keyframes drop{
+    from{transform:translateY(-22px);opacity:0;}
+    to{transform:translateY(0);opacity:1;}
+  }
+  .sample-caption{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--steel-400);
+    text-align:center;margin-top:14px;line-height:1.5;
+  }
+
+  /* ---------- SERVICES ---------- */
+  .section-head{max-width:640px;margin-bottom:48px;}
+  .section-head h2{font-size:clamp(26px,3.4vw,38px);font-weight:700;}
+
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  @media (max-width:900px){ .cards3{grid-template-columns:1fr;} }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px 26px;
+  }
+  .card .tag{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--amber-600);
+    letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;
+  }
+  .card h3{font-size:22px;font-weight:700;margin-bottom:12px;}
+  .card p{color:var(--steel-600);font-size:15px;margin:0;}
+  .swatch{height:96px;border-radius:9px;margin-bottom:18px;overflow:hidden;background:var(--duct-bg);}
+  .swatch svg,.swatch img{width:100%;height:100%;}
+  .swatch img{object-fit:cover;}
+  .swatch-square{
+    height:auto;
+    aspect-ratio:1;
+    max-height:210px;
+    background:var(--concrete-100);
+  }
+
+  /* ---------- PROCESS ---------- */
+  .steps{border-top:1px solid var(--line);}
+  .step{
+    display:grid;grid-template-columns:88px 1fr;gap:26px;
+    padding:26px 0;border-bottom:1px solid var(--line);
+  }
+  .step .num{
+    font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--amber-600);font-weight:500;
+    padding-top:3px;
+  }
+  .step h3{font-size:19px;font-weight:700;margin-bottom:6px;}
+  .step p{color:var(--steel-600);margin:0;max-width:60ch;font-size:15px;}
+  @media (max-width:600px){ .step{grid-template-columns:44px 1fr;gap:16px;} }
+
+  /* ---------- WHY ---------- */
+  .why-bg{background:var(--graphite-900);color:var(--concrete-50);}
+  .why-bg .eyebrow{color:var(--amber-500);}
+  .why-bg .eyebrow::before{background:var(--amber-500);}
+  .why-bg .section-head h2{color:var(--concrete-50);}
+  .why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+  @media (max-width:920px){ .why-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .why-grid{grid-template-columns:1fr;} }
+  .why-item{
+    border-top:2px solid var(--amber-500);
+    padding-top:16px;
+  }
+  .why-item h3{font-size:16.5px;font-weight:700;margin-bottom:8px;font-family:'Manrope',sans-serif;}
+  .why-item p{color:#AEB7BA;font-size:14.5px;margin:0;}
+
+  /* ---------- PORTFOLIO / EMPTY STATE ---------- */
+  .empty-state{
+    border:1.5px dashed var(--aluminium-400);
+    border-radius:var(--radius);
+    padding:36px 28px;
+    text-align:center;
+    color:var(--steel-600);
+    margin-top:36px;
+    font-size:14.5px;
+  }
+  .gallery-panel{
+    margin-top:36px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel);
+    padding:24px;
+  }
+  .gallery-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    margin-bottom:22px;
+  }
+  .gallery-head h3{
+    font-size:19px;
+  }
+  .gallery-head p{
+    margin:6px 0 0;
+    color:var(--steel-600);
+    font-size:14.5px;
+  }
+  .gallery-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+  .gallery-grid img{
+    width:100%;
+    aspect-ratio:1;
+    object-fit:cover;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:var(--concrete-100);
+  }
+  .upload-box{
+    display:none;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:18px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .upload-box.visible{display:flex;}
+  .upload-input{
+    max-width:100%;
+    color:var(--steel-600);
+    font-family:'Manrope',sans-serif;
+    font-size:14px;
+  }
+  .gallery-status{
+    width:100%;
+    margin:4px 0 0;
+    color:var(--steel-600);
+    font-size:13.5px;
+  }
+  .gallery-empty{
+    border:1.5px dashed var(--aluminium-400);
+    border-radius:9px;
+    padding:28px 20px;
+    text-align:center;
+    color:var(--steel-600);
+    font-size:14.5px;
+  }
+  @media (max-width:760px){
+    .gallery-head{display:block;}
+    .gallery-actions{justify-content:flex-start;margin-top:14px;}
+    .gallery-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:460px){ .gallery-grid{grid-template-columns:1fr;} }
+
+  /* ---------- CONTACT ---------- */
+  .contact-grid{
+    display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:start;
+  }
+  @media (max-width:860px){ .contact-grid{grid-template-columns:1fr;} }
+  .contact-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:30px;
+  }
+  .contact-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:16px 0;border-bottom:1px solid var(--line);
+  }
+  .contact-row:last-child{border-bottom:none;}
+  .contact-row .label{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--steel-600);
+    text-transform:uppercase;letter-spacing:.06em;
+  }
+  .contact-row .value{font-weight:700;font-size:16.5px;text-align:right;}
+  .contact-row .value a{text-decoration:none;}
+  .contact-row .value a:hover{color:var(--amber-600);}
+  .contact-note{
+    margin:18px 0 0;
+    color:var(--steel-600);
+    font-size:13.5px;
+  }
+  @media (max-width:560px){
+    .contact-row{display:block;}
+    .contact-row .label{display:block;margin-bottom:4px;}
+    .contact-row .value{text-align:left;}
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:30px 0;
+  }
+  .foot-row{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    font-size:13px;color:var(--steel-600);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap headbar">
+    <div class="logo">
+      МАЙСТЕР СТЕЛЬ
+      <small>Грильято · Армстронг · Кубічні рейки</small>
+    </div>
+    <nav class="mainnav" id="mainnav">
+      <a href="#services">Послуги</a>
+      <a href="#process">Процес</a>
+      <a href="#why">Чому я</a>
+      <a href="#portfolio">Системи</a>
+      <a href="#contact">Контакти</a>
+    </nav>
+    <div class="head-actions">
+      <a class="btn btn-ghost btn-ghost-desktop" href="tel:+380662375587">+380 66 237 55 87</a>
+      <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Підвісні стелі · під ключ</p>
+        <h1>Стеля, яка<br>тримає <em>рівень</em></h1>
+        <p class="lead">Монтаж грильято, армстронг та кубічних реєчних стель у Києві та області. Замір, розрахунок і встановлення — від першого профілю до останньої панелі, власними руками.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="tel:+380662375587">Зателефонувати</a>
+          <a class="btn btn-line" href="https://t.me/PStanislavV" target="_blank" rel="noopener">Написати в Telegram</a>
+        </div>
+        <div class="hero-stat"><span class="dot"></span>Понад 7 років на об'єктах Києва та області</div>
+        <div class="proof-row" aria-label="Коротко про роботу">
+          <div class="proof-item"><strong>1 день</strong><span>на замір і попередній розрахунок</span></div>
+          <div class="proof-item"><strong>600×600</strong><span>плити, решітки, рейки та світло</span></div>
+          <div class="proof-item"><strong>Київ+</strong><span>виїзд по місту та найближчій області</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sample-frame">
+          <div class="sample-grid" id="sampleGrid" aria-hidden="true"></div>
+        </div>
+        <p class="sample-caption">Наведіть курсор на панель — під кожною стелею завжди є проводка й вентиляція, до яких потрібен доступ</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Системи, з якими я працюю</p>
+        <h2>Три типи стель — один результат: рівно і надовго</h2>
+      </div>
+
+      <div class="cards3">
+        <div class="card">
+          <div class="tag">Решітчаста система</div>
+          <h3>Грильято</h3>
+          <p>Решітка з квадратних чарунок і відкритим простором над нею. Легкий доступ до вентиляції та проводки — тому це стандарт для офісів, торгових центрів і паркінгів.</p>
+        </div>
+        <div class="card">
+          <div class="tag">Плитна система</div>
+          <h3>Армстронг</h3>
+          <p>Мінеральні плити 600×600 мм у металевому каркасі. Рівна, тиха стеля з високою вогнестійкістю — класика для офісних і адміністративних приміщень.</p>
+        </div>
+        <div class="card">
+          <div class="tag">Реєчна система</div>
+          <h3>Кубічні рейки</h3>
+          <p>Алюмінієві рейки прямокутного перерізу з чіткими лініями та прихованим підсвічуванням. Вологостійкі — добре працюють на кухнях, у санвузлах і сучасних інтер'єрах.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Як проходить робота</p>
+        <h2>П'ять кроків від замовлення до готової стелі</h2>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="num">01</div>
+          <div><h3>Виїзд і замір</h3><p>Приїжджаю на об'єкт, знімаю точні розміри, перевіряю комунікації над майбутньою стелею.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">02</div>
+          <div><h3>Розрахунок матеріалу</h3><p>Рахую профіль і панелі під конкретне приміщення — без округлення «про всяк випадок». Платите за те, що дійсно піде в стелю.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">03</div>
+          <div><h3>Монтаж каркасу</h3><p>Виставляю профіль по лазерному рівню — від точності каркаса залежить уся стеля.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">04</div>
+          <div><h3>Встановлення панелей</h3><p>Вставляю панелі або рейки, монтую світильники, вентиляційні решітки й люки ревізії.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">05</div>
+          <div><h3>Здача об'єкта</h3><p>Прибираю за собою робоче місце, показую результат і даю гарантію на монтаж.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="why" class="why-bg">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Чому зі мною</p>
+        <h2>Чотири речі, на яких я не економлю</h2>
+      </div>
+
+      <div class="why-grid">
+        <div class="why-item">
+          <h3>Особиста відповідальність</h3>
+          <p>Сам приїжджаю на замір, сам монтую і сам здаю об'єкт — без підрядників «десь там».</p>
+        </div>
+        <div class="why-item">
+          <h3>Прозорий кошторис</h3>
+          <p>Кількість матеріалу і вартість робіт узгоджуємо до початку монтажу, без сюрпризів у процесі.</p>
+        </div>
+        <div class="why-item">
+          <h3>Перевірені матеріали</h3>
+          <p>Працюю з профілем і панелями Armstrong, Cesal, Албес та інших виробників із гарантією якості.</p>
+        </div>
+        <div class="why-item">
+          <h3>Гарантія на роботу</h3>
+          <p>Даю гарантію на монтаж і безкоштовно виправляю недоліки, якщо вони виникли з моєї вини.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Системи в деталях</p>
+        <h2>Як виглядає кожна система зблизька</h2>
+      </div>
+
+      <div class="cards3">
+        <div class="card">
+          <div class="swatch swatch-square">
+            <img src="assets/grilyato-ceiling.png" alt="Фото стелі грильято з відкритою квадратною решіткою">
+          </div>
+          <h3>Грильято</h3>
+          <p>Відкрита решітка чарунок ~150×150 мм. Простір над стелею залишається доступним для обслуговування.</p>
+        </div>
+
+        <div class="card">
+          <div class="swatch swatch-square">
+            <img src="assets/armstrong-ceiling.png" alt="Фото стелі Армстронг з квадратними плитами 600×600 мм">
+          </div>
+          <h3>Армстронг</h3>
+          <p>Плити 600×600 мм у видимому металевому каркасі. Матова текстура, вбудовані світильники врівень з плитами.</p>
+        </div>
+
+        <div class="card">
+          <div class="swatch swatch-square">
+            <img src="assets/cubic-rails-ceiling.png" alt="Фото стелі з кубічними алюмінієвими рейками">
+          </div>
+          <h3>Кубічні рейки</h3>
+          <p>Вузькі алюмінієві рейки з рівними проміжками. Лінійний малюнок, який візуально витягує приміщення.</p>
+        </div>
+      </div>
+
+      <div class="gallery-panel" aria-live="polite">
+        <div class="gallery-head">
+          <div>
+            <h3>Фото останніх об'єктів</h3>
+            <p>Усі відвідувачі бачать опубліковані роботи. Додавати фото може тільки майстер.</p>
+          </div>
+          <div class="gallery-actions">
+            <button class="btn btn-line" type="button" id="gallerySignIn">Увійти</button>
+            <button class="btn btn-line" type="button" id="gallerySignOut" hidden>Вийти</button>
+          </div>
+        </div>
+
+        <div class="gallery-grid" id="projectGallery">
+          <div class="gallery-empty">Фото об'єктів з'являться тут після публікації.</div>
+        </div>
+
+        <form class="upload-box" id="photoUploadForm">
+          <input class="upload-input" id="photoUploadInput" type="file" accept="image/*" multiple>
+          <button class="btn btn-primary" type="submit">Завантажити фото</button>
+          <p class="gallery-status" id="galleryStatus"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap contact-grid">
+      <div>
+        <p class="eyebrow">Зв'язок</p>
+        <h2 style="font-size:clamp(26px,3.4vw,38px);font-weight:700;margin-bottom:16px;">Обговоримо вашу стелю</h2>
+        <p style="color:var(--steel-600);max-width:52ch;font-size:16px;">Залишається зателефонувати або написати — розкажу, яка система підійде під ваше приміщення, і назву орієнтовну вартість ще до виїзду на замір.</p>
+        <div class="hero-ctas" style="margin-top:26px;">
+          <a class="btn btn-primary" href="tel:+380662375587">Зателефонувати</a>
+          <a class="btn btn-line" href="https://t.me/PStanislavV" target="_blank" rel="noopener">Telegram</a>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-row">
+          <span class="label">Телефон</span>
+          <span class="value"><a href="tel:+380662375587">+380 66 237 55 87</a></span>
+        </div>
+        <div class="contact-row">
+          <span class="label">Telegram</span>
+          <span class="value"><a href="https://t.me/PStanislavV" target="_blank" rel="noopener">@PStanislavV</a></span>
+        </div>
+        <div class="contact-row">
+          <span class="label">Регіон роботи</span>
+          <span class="value">Київ і область</span>
+        </div>
+        <div class="contact-row">
+          <span class="label">Графік</span>
+          <span class="value">Пн–Сб, 8:00–19:00</span>
+        </div>
+        <p class="contact-note">Якщо не відповідаю одразу, залиште повідомлення в Telegram — передзвоню, щойно звільнюся на об'єкті.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>© 2026 Майстер Стель</span>
+    <span>Грильято · Армстронг · Кубічні рейки</span>
+  </div>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  const burger = document.getElementById('burgerBtn');
+  const nav = document.getElementById('mainnav');
+  if (burger && nav) {
+    burger.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    }));
+  }
+
+  // Build the interactive ceiling sample grid
+  const grid = document.getElementById('sampleGrid');
+  const cols = 6, rows = 3;
+  const ductSVG = `
+    <svg viewBox="0 0 40 40" preserveAspectRatio="none">
+      <rect width="40" height="40" fill="#12181B"/>
+      <line x1="0" y1="20" x2="40" y2="20" stroke="#55666E" stroke-width="1.6"/>
+      <line x1="20" y1="0" x2="20" y2="40" stroke="#3A464B" stroke-width="1.2"/>
+      <circle cx="20" cy="20" r="1.8" fill="#E7A33B" opacity="0.55"/>
+    </svg>`;
+
+  if (grid) {
+    for (let i = 0; i < cols * rows; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (i % 5 === 2 ? ' has-light' : '');
+      cell.setAttribute('tabindex', '0');
+      cell.innerHTML =
+        `<div class="below">${ductSVG}</div>` +
+        `<div class="tile" style="animation-delay:${i * 35}ms"></div>`;
+      grid.appendChild(cell);
+    }
+  }
+</script>
+
+<script type="module">
+  const allowedUploaderEmail = 'petrostanislav@gmail.com';
+  const firebaseConfig = {
+    apiKey: 'PASTE_FIREBASE_API_KEY',
+    authDomain: 'PASTE_FIREBASE_AUTH_DOMAIN',
+    projectId: 'PASTE_FIREBASE_PROJECT_ID',
+    storageBucket: 'PASTE_FIREBASE_STORAGE_BUCKET',
+    messagingSenderId: 'PASTE_FIREBASE_MESSAGING_SENDER_ID',
+    appId: 'PASTE_FIREBASE_APP_ID'
+  };
+
+  const gallery = document.getElementById('projectGallery');
+  const signInButton = document.getElementById('gallerySignIn');
+  const signOutButton = document.getElementById('gallerySignOut');
+  const uploadForm = document.getElementById('photoUploadForm');
+  const uploadInput = document.getElementById('photoUploadInput');
+  const statusLine = document.getElementById('galleryStatus');
+  const firebaseReady = !firebaseConfig.apiKey.startsWith('PASTE_');
+
+  const setStatus = (message) => {
+    if (statusLine) statusLine.textContent = message;
+  };
+
+  const renderEmpty = (message) => {
+    if (!gallery) return;
+    gallery.innerHTML = `<div class="gallery-empty">${message}</div>`;
+  };
+
+  if (!firebaseReady) {
+    renderEmpty('Галерея готова до підключення. Додайте Firebase config, щоб майстер міг завантажувати фото.');
+    if (signInButton) signInButton.disabled = true;
+  } else {
+    const [
+      { initializeApp },
+      {
+        getAuth,
+        GoogleAuthProvider,
+        onAuthStateChanged,
+        signInWithPopup,
+        signOut
+      },
+      {
+        getDownloadURL,
+        getStorage,
+        listAll,
+        ref,
+        uploadBytes
+      }
+    ] = await Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js')
+    ]);
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+    const provider = new GoogleAuthProvider();
+    const photosRef = ref(storage, 'project-photos');
+
+    const loadGallery = async () => {
+      if (!gallery) return;
+      try {
+        const list = await listAll(photosRef);
+        if (!list.items.length) {
+          renderEmpty("Фото об'єктів з'являться тут після публікації.");
+          return;
+        }
+
+        const urls = await Promise.all(
+          list.items.map(async (item) => ({
+            name: item.name,
+            url: await getDownloadURL(item)
+          }))
+        );
+
+        gallery.innerHTML = urls
+          .sort((a, b) => b.name.localeCompare(a.name))
+          .map((photo) => `<img src="${photo.url}" alt="Фото виконаного об'єкта">`)
+          .join('');
+      } catch (error) {
+        renderEmpty('Не вдалося завантажити фото. Спробуйте оновити сторінку.');
+      }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      const isAllowedUploader = user?.email?.toLowerCase() === allowedUploaderEmail;
+      if (uploadForm) uploadForm.classList.toggle('visible', Boolean(isAllowedUploader));
+      if (signInButton) signInButton.hidden = Boolean(user);
+      if (signOutButton) signOutButton.hidden = !user;
+
+      if (user && !isAllowedUploader) {
+        setStatus('Цей акаунт може переглядати фото, але не може їх додавати.');
+      } else if (isAllowedUploader) {
+        setStatus('Ви увійшли як майстер. Можна додавати фото об’єктів.');
+      } else {
+        setStatus('');
+      }
+    });
+
+    signInButton?.addEventListener('click', async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        setStatus('Не вдалося увійти. Спробуйте ще раз.');
+      }
+    });
+
+    signOutButton?.addEventListener('click', async () => {
+      await signOut(auth);
+    });
+
+    uploadForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const user = auth.currentUser;
+      const isAllowedUploader = user?.email?.toLowerCase() === allowedUploaderEmail;
+      const files = Array.from(uploadInput?.files || []);
+
+      if (!isAllowedUploader) {
+        setStatus('Завантажувати фото може тільки petrostanislav@gmail.com.');
+        return;
+      }
+      if (!files.length) {
+        setStatus('Оберіть одне або кілька фото.');
+        return;
+      }
+
+      setStatus('Завантаження...');
+      try {
+        await Promise.all(files.map((file) => {
+          const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+          const filename = `${Date.now()}-${safeName}`;
+          return uploadBytes(ref(storage, `project-photos/${filename}`), file, {
+            contentType: file.type,
+            customMetadata: { uploadedBy: user.email }
+          });
+        }));
+        uploadForm.reset();
+        setStatus('Фото завантажено.');
+        await loadGallery();
+      } catch (error) {
+        setStatus('Не вдалося завантажити фото. Перевірте права доступу.');
+      }
+    });
+
+    loadGallery();
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+.vercel
+.firebase
+.repo-git
+node_modules
+firebase-debug.log
+*.local

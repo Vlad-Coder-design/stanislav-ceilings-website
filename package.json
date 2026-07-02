@@ -1,0 +1,10 @@
+{
+  "name": "stanislav-ceilings-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "vercel dev",
+    "deploy": "vercel --prod",
+    "firebase:rules": "firebase deploy --only storage"
+  }
+}
