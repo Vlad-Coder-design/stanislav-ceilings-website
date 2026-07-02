@@ -311,12 +311,6 @@
     color:var(--steel-600);
     font-size:14.5px;
   }
-  .gallery-actions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
   .gallery-grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -330,28 +324,6 @@
     border:1px solid var(--line);
     background:var(--concrete-100);
   }
-  .upload-box{
-    display:none;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-top:18px;
-    padding-top:18px;
-    border-top:1px solid var(--line);
-  }
-  .upload-box.visible{display:flex;}
-  .upload-input{
-    max-width:100%;
-    color:var(--steel-600);
-    font-family:'Manrope',sans-serif;
-    font-size:14px;
-  }
-  .gallery-status{
-    width:100%;
-    margin:4px 0 0;
-    color:var(--steel-600);
-    font-size:13.5px;
-  }
   .gallery-empty{
     border:1.5px dashed var(--aluminium-400);
     border-radius:9px;
@@ -360,9 +332,10 @@
     color:var(--steel-600);
     font-size:14.5px;
   }
+  .gallery-empty a{font-weight:700;text-decoration:none;color:var(--amber-600);}
+  .gallery-empty a:hover{text-decoration:underline;}
   @media (max-width:760px){
     .gallery-head{display:block;}
-    .gallery-actions{justify-content:flex-start;margin-top:14px;}
     .gallery-grid{grid-template-columns:repeat(2,1fr);}
   }
   @media (max-width:460px){ .gallery-grid{grid-template-columns:1fr;} }
@@ -596,23 +569,13 @@
         <div class="gallery-head">
           <div>
             <h3>Фото останніх об'єктів</h3>
-            <p>Усі відвідувачі бачать опубліковані роботи. Додавати фото може тільки майстер.</p>
-          </div>
-          <div class="gallery-actions">
-            <button class="btn btn-line" type="button" id="gallerySignIn">Увійти</button>
-            <button class="btn btn-line" type="button" id="gallerySignOut" hidden>Вийти</button>
+            <p>Усі відвідувачі бачать опубліковані роботи. Фото додаються безкоштовно через GitHub.</p>
           </div>
         </div>
 
         <div class="gallery-grid" id="projectGallery">
           <div class="gallery-empty">Фото об'єктів з'являться тут після публікації.</div>
         </div>
-
-        <form class="upload-box" id="photoUploadForm">
-          <input class="upload-input" id="photoUploadInput" type="file" accept="image/*" multiple>
-          <button class="btn btn-primary" type="submit">Завантажити фото</button>
-          <p class="gallery-status" id="galleryStatus"></p>
-        </form>
       </div>
     </div>
   </section>
@@ -700,153 +663,45 @@
   }
 </script>
 
-<script type="module">
-  const allowedUploaderEmail = 'petrostanislav@gmail.com';
-  const firebaseConfig = {
-    apiKey: 'AIzaSyB5x5G4DTaMWrcrIUfS1VgOrnAB-GEtQCg',
-    authDomain: 'stanislav-ceilings.firebaseapp.com',
-    projectId: 'stanislav-ceilings',
-    storageBucket: 'stanislav-ceilings.firebasestorage.app',
-    messagingSenderId: '57106479143',
-    appId: '1:57106479143:web:6ebef3553886ee76313602'
-  };
-
+<script>
   const gallery = document.getElementById('projectGallery');
-  const signInButton = document.getElementById('gallerySignIn');
-  const signOutButton = document.getElementById('gallerySignOut');
-  const uploadForm = document.getElementById('photoUploadForm');
-  const uploadInput = document.getElementById('photoUploadInput');
-  const statusLine = document.getElementById('galleryStatus');
-  const firebaseReady = !firebaseConfig.apiKey.startsWith('PASTE_');
-
-  const setStatus = (message) => {
-    if (statusLine) statusLine.textContent = message;
-  };
+  const galleryApiUrl = 'https://api.github.com/repos/Vlad-Coder-design/stanislav-ceilings-website/contents/assets/projects';
+  const imagePattern = /\.(avif|gif|jpe?g|png|webp)$/i;
 
   const renderEmpty = (message) => {
     if (!gallery) return;
     gallery.innerHTML = `<div class="gallery-empty">${message}</div>`;
   };
 
-  if (!firebaseReady) {
-    renderEmpty('Галерея готова до підключення. Додайте Firebase config, щоб майстер міг завантажувати фото.');
-    if (signInButton) signInButton.disabled = true;
-  } else {
-    const [
-      { initializeApp },
-      {
-        getAuth,
-        GoogleAuthProvider,
-        onAuthStateChanged,
-        signInWithPopup,
-        signOut
-      },
-      {
-        getDownloadURL,
-        getStorage,
-        listAll,
-        ref,
-        uploadBytes
-      }
-    ] = await Promise.all([
-      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
-      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js'),
-      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js')
-    ]);
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const storage = getStorage(app);
-    const provider = new GoogleAuthProvider();
-    const photosRef = ref(storage, 'project-photos');
-
-    const loadGallery = async () => {
-      if (!gallery) return;
-      try {
-        const list = await listAll(photosRef);
-        if (!list.items.length) {
-          renderEmpty("Фото об'єктів з'являться тут після публікації.");
-          return;
-        }
-
-        const urls = await Promise.all(
-          list.items.map(async (item) => ({
-            name: item.name,
-            url: await getDownloadURL(item)
-          }))
-        );
-
-        gallery.innerHTML = urls
-          .sort((a, b) => b.name.localeCompare(a.name))
-          .map((photo) => `<img src="${photo.url}" alt="Фото виконаного об'єкта">`)
-          .join('');
-      } catch (error) {
-        renderEmpty('Галерея підключена до Firebase, але Storage ще потрібно активувати в консолі Firebase.');
-      }
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      const isAllowedUploader = user?.email?.toLowerCase() === allowedUploaderEmail;
-      if (uploadForm) uploadForm.classList.toggle('visible', Boolean(isAllowedUploader));
-      if (signInButton) signInButton.hidden = Boolean(user);
-      if (signOutButton) signOutButton.hidden = !user;
-
-      if (user && !isAllowedUploader) {
-        setStatus('Цей акаунт може переглядати фото, але не може їх додавати.');
-      } else if (isAllowedUploader) {
-        setStatus('Ви увійшли як майстер. Можна додавати фото об’єктів.');
-      } else {
-        setStatus('');
-      }
-    });
-
-    signInButton?.addEventListener('click', async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        setStatus('Не вдалося увійти. Спробуйте ще раз.');
-      }
-    });
-
-    signOutButton?.addEventListener('click', async () => {
-      await signOut(auth);
-    });
-
-    uploadForm?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const user = auth.currentUser;
-      const isAllowedUploader = user?.email?.toLowerCase() === allowedUploaderEmail;
-      const files = Array.from(uploadInput?.files || []);
-
-      if (!isAllowedUploader) {
-        setStatus('Завантажувати фото може тільки petrostanislav@gmail.com.');
+  const loadGallery = async () => {
+    if (!gallery) return;
+    try {
+      const response = await fetch(galleryApiUrl, { headers: { Accept: 'application/vnd.github+json' } });
+      if (response.status === 404) {
+        renderEmpty("Фото об'єктів з'являться тут після додавання файлів у GitHub.");
         return;
       }
-      if (!files.length) {
-        setStatus('Оберіть одне або кілька фото.');
+      if (!response.ok) throw new Error('Gallery request failed');
+
+      const files = await response.json();
+      const photos = files
+        .filter((file) => file.type === 'file' && imagePattern.test(file.name) && file.download_url)
+        .sort((a, b) => b.name.localeCompare(a.name));
+
+      if (!photos.length) {
+        renderEmpty("Фото об'єктів з'являться тут після додавання файлів у GitHub.");
         return;
       }
 
-      setStatus('Завантаження...');
-      try {
-        await Promise.all(files.map((file) => {
-          const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
-          const filename = `${Date.now()}-${safeName}`;
-          return uploadBytes(ref(storage, `project-photos/${filename}`), file, {
-            contentType: file.type,
-            customMetadata: { uploadedBy: user.email }
-          });
-        }));
-        uploadForm.reset();
-        setStatus('Фото завантажено.');
-        await loadGallery();
-      } catch (error) {
-        setStatus('Не вдалося завантажити фото. Перевірте, що Firebase Storage активовано і правила опубліковано.');
-      }
-    });
+      gallery.innerHTML = photos
+        .map((photo) => `<img src="${photo.download_url}" alt="Фото виконаного об'єкта">`)
+        .join('');
+    } catch (error) {
+      renderEmpty('Не вдалося завантажити фото з GitHub. Спробуйте оновити сторінку.');
+    }
+  };
 
-    loadGallery();
-  }
+  loadGallery();
 </script>
 
 </body>

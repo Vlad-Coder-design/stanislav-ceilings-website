@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "start": "vercel dev",
-    "deploy": "vercel --prod",
-    "firebase:rules": "firebase deploy --only storage"
+    "deploy": "vercel --prod"
   }
 }
