@@ -103,6 +103,46 @@
   }
   nav.mainnav a:hover::after{width:100%;}
   .head-actions{display:flex;align-items:center;gap:14px;}
+  .music-mixer{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    min-width:176px;
+    padding:7px 10px;
+    border:1.5px solid var(--line);
+    border-radius:999px;
+    background:rgba(246,247,247,.68);
+  }
+  .music-toggle{
+    width:30px;
+    height:30px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    border-radius:50%;
+    background:var(--amber-500);
+    color:var(--graphite-900);
+    font-weight:800;
+    cursor:pointer;
+  }
+  .music-toggle:hover{background:var(--amber-600);}
+  .music-label{
+    font-size:12px;
+    font-weight:800;
+    color:var(--graphite-700);
+  }
+  .music-volume{
+    width:70px;
+    accent-color:var(--amber-600);
+  }
+  .youtube-player{
+    position:absolute;
+    width:1px;
+    height:1px;
+    left:-9999px;
+    overflow:hidden;
+  }
   .btn{
     display:inline-flex;align-items:center;gap:8px;
     font-family:'Manrope',sans-serif;font-weight:700;font-size:14.5px;
@@ -131,6 +171,15 @@
     nav.mainnav a{font-size:19px;}
     .head-actions .btn-ghost-desktop{display:none;}
     .burger{display:block;}
+  }
+  @media (max-width:1040px){
+    .music-mixer{min-width:118px;}
+    .music-label{display:none;}
+    .music-volume{width:58px;}
+  }
+  @media (max-width:430px){
+    .music-mixer{min-width:82px;padding:6px 8px;gap:6px;}
+    .music-volume{width:42px;}
   }
 
   /* ---------- HERO ---------- */
@@ -449,12 +498,18 @@
       <a href="#contact">Контакти</a>
     </nav>
     <div class="head-actions">
+      <div class="music-mixer" aria-label="Музичний плеєр">
+        <button class="music-toggle" id="musicToggle" type="button" aria-label="Увімкнути музику" aria-pressed="false">▶</button>
+        <label class="music-label" for="musicVolume">Музика</label>
+        <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="45" aria-label="Гучність музики">
+      </div>
       <a class="btn btn-ghost btn-ghost-desktop" href="tel:+380662375587">+380 66 237 55 87</a>
       <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
   </div>
+  <div class="youtube-player" id="youtubePlayer" aria-hidden="true"></div>
 </header>
 
 <main>
@@ -689,6 +744,74 @@
 </footer>
 
 <script>
+  // Header music player
+  const musicToggle = document.getElementById('musicToggle');
+  const musicVolume = document.getElementById('musicVolume');
+  let musicPlayer;
+  let musicPlayerReady = false;
+  let musicShouldPlay = false;
+  let musicPlaying = false;
+
+  const updateMusicButton = () => {
+    if (!musicToggle) return;
+    musicToggle.textContent = musicPlaying ? 'II' : '▶';
+    musicToggle.setAttribute('aria-pressed', musicPlaying ? 'true' : 'false');
+    musicToggle.setAttribute('aria-label', musicPlaying ? 'Вимкнути музику' : 'Увімкнути музику');
+  };
+
+  window.onYouTubeIframeAPIReady = () => {
+    musicPlayer = new YT.Player('youtubePlayer', {
+      videoId: 'EaUQbQ2PL-4',
+      width: 1,
+      height: 1,
+      playerVars: {
+        controls: 0,
+        disablekb: 1,
+        modestbranding: 1,
+        playsinline: 1,
+        rel: 0,
+      },
+      events: {
+        onReady: () => {
+          musicPlayerReady = true;
+          musicPlayer.setVolume(Number(musicVolume?.value || 45));
+          if (musicShouldPlay) musicPlayer.playVideo();
+        },
+        onStateChange: (event) => {
+          musicPlaying = event.data === YT.PlayerState.PLAYING;
+          updateMusicButton();
+        },
+      },
+    });
+  };
+
+  if (musicToggle) {
+    musicToggle.addEventListener('click', () => {
+      musicShouldPlay = !musicPlaying;
+      if (!musicPlayerReady || !musicPlayer) {
+        musicToggle.textContent = '…';
+        return;
+      }
+      if (musicPlaying) {
+        musicPlayer.pauseVideo();
+      } else {
+        musicPlayer.playVideo();
+      }
+    });
+  }
+
+  if (musicVolume) {
+    musicVolume.addEventListener('input', () => {
+      if (musicPlayerReady && musicPlayer) {
+        musicPlayer.setVolume(Number(musicVolume.value));
+      }
+    });
+  }
+
+  const youtubeApi = document.createElement('script');
+  youtubeApi.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(youtubeApi);
+
   // Mobile nav toggle
   const burger = document.getElementById('burgerBtn');
   const nav = document.getElementById('mainnav');
