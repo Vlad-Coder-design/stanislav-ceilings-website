@@ -18,6 +18,8 @@ Vercel will redeploy automatically, and the website will show the images.
 
 Only GitHub users with write access to the repository can add photos.
 
+Invite `petrostanislav@gmail.com` to the repository as a collaborator with write access. After he accepts the GitHub invitation, he can use the **Додати фото** button on the live website to open the upload page.
+
 Everyone can view the published photos on the website.
 
 No Firebase Storage, Blaze plan, or paid backend is required.
