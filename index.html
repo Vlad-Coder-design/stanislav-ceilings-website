@@ -406,29 +406,63 @@
     display:grid;
     grid-template-columns:repeat(6,1fr);
     gap:5px;
-    perspective:900px;
+    perspective:1100px;
   }
-  .cell{position:relative;aspect-ratio:1;}
+  .cell{
+    position:relative;
+    aspect-ratio:1;
+    border-radius:3px;
+    transform-style:preserve-3d;
+    outline:none;
+  }
   .cell .below{
-    position:absolute;inset:0;border-radius:2px;overflow:hidden;background:var(--duct-bg);
+    position:absolute;
+    inset:0;
+    border-radius:3px;
+    overflow:hidden;
+    background:radial-gradient(circle at 68% 28%,rgba(231,163,59,.16),transparent 22%),var(--duct-bg);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
   }
   .cell .below svg{width:100%;height:100%;}
   .cell .tile{
-    position:absolute;inset:0;border-radius:2px;
-    background:linear-gradient(150deg,#F5F6F6,#D9DCDC 65%,#CBCECE);
-    box-shadow:inset 0 0 0 1px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.18);
-    transition:transform .38s cubic-bezier(.2,.8,.2,1), box-shadow .38s ease;
+    position:absolute;
+    inset:0;
+    border-radius:3px;
+    background:linear-gradient(150deg,#F5F6F6,#D9DCDC 64%,#C4C8C8);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.2);
+    transform-origin:50% 0;
+    transform-style:preserve-3d;
+    backface-visibility:visible;
+    transition:transform .58s cubic-bezier(.18,.82,.22,1), box-shadow .58s ease, filter .58s ease;
     animation:drop .55s cubic-bezier(.2,.8,.2,1) both;
     cursor:pointer;
+  }
+  .cell .tile::before{
+    content:"";
+    position:absolute;
+    left:0;right:0;top:0;height:5px;
+    border-radius:3px 3px 0 0;
+    background:linear-gradient(90deg,rgba(255,255,255,.7),rgba(27,33,36,.12));
+    transform:translateZ(1px);
   }
   .cell.has-light .tile::after{
     content:"";position:absolute;inset:32%;border-radius:50%;
     background:var(--amber-500);
     box-shadow:0 0 10px 3px rgba(231,163,59,.55);
+    transform:translateZ(2px);
+  }
+  .cell.has-light .below::after{
+    content:"";
+    position:absolute;
+    inset:31%;
+    border-radius:50%;
+    background:var(--amber-500);
+    box-shadow:0 0 12px 4px rgba(231,163,59,.45);
   }
   .cell:hover .tile, .cell:focus-within .tile{
-    transform:translateY(-11px) scale(.92);
-    box-shadow:0 18px 22px -6px rgba(0,0,0,.4);
+    transform:rotateX(112deg) translateY(-2px);
+    filter:brightness(.96);
+    box-shadow:0 20px 24px -10px rgba(0,0,0,.48);
   }
   @keyframes drop{
     from{transform:translateY(-22px);opacity:0;}
@@ -737,7 +771,7 @@
 
       <div>
         <div class="sample-frame">
-          <div class="sample-grid" id="sampleGrid" aria-hidden="true"></div>
+          <div class="sample-grid" id="sampleGrid" aria-label="Інтерактивний зразок стелі з доступом до проводки й вентиляції"></div>
         </div>
         <p class="sample-caption">Наведіть курсор на панель — під кожною стелею завжди є проводка й вентиляція, до яких потрібен доступ</p>
       </div>
@@ -1138,9 +1172,14 @@
   const ductSVG = `
     <svg viewBox="0 0 40 40" preserveAspectRatio="none">
       <rect width="40" height="40" fill="#12181B"/>
-      <line x1="0" y1="20" x2="40" y2="20" stroke="#55666E" stroke-width="1.6"/>
-      <line x1="20" y1="0" x2="20" y2="40" stroke="#3A464B" stroke-width="1.2"/>
-      <circle cx="20" cy="20" r="1.8" fill="#E7A33B" opacity="0.55"/>
+      <path d="M-5 12 C8 8,16 18,28 13 S44 14,48 8" fill="none" stroke="#71848C" stroke-width="2.5" stroke-linecap="round" opacity=".9"/>
+      <path d="M-4 29 H44" fill="none" stroke="#46545A" stroke-width="4.6" stroke-linecap="round" opacity=".88"/>
+      <path d="M-4 29 H44" fill="none" stroke="#9AA7AC" stroke-width=".9" stroke-linecap="round" opacity=".5"/>
+      <rect x="23" y="4" width="10" height="14" rx="2" fill="#263137" stroke="#7E8D93" stroke-width="1" opacity=".92"/>
+      <path d="M4 5 V35" fill="none" stroke="#2F3A40" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M4 5 V35" fill="none" stroke="#6F7E84" stroke-width=".7" stroke-linecap="round"/>
+      <circle cx="20" cy="20" r="2.2" fill="#E7A33B" opacity=".72"/>
+      <path d="M20 20 C24 16,28 21,35 17" fill="none" stroke="#E7A33B" stroke-width=".9" stroke-linecap="round" opacity=".62"/>
     </svg>`;
 
   if (grid) {
@@ -1148,6 +1187,8 @@
       const cell = document.createElement('div');
       cell.className = 'cell' + (i % 5 === 2 ? ' has-light' : '');
       cell.setAttribute('tabindex', '0');
+      cell.setAttribute('role', 'img');
+      cell.setAttribute('aria-label', 'Панель стелі: наведіть або сфокусуйте, щоб побачити труби, вентиляцію та проводку');
       cell.innerHTML =
         `<div class="below">${ductSVG}</div>` +
         `<div class="tile" style="animation-delay:${i * 35}ms"></div>`;
