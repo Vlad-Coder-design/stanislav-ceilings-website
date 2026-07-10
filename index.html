@@ -8,6 +8,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9KXD88V94"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-C9KXD88V94');
+</script>
 <style>
   :root{
     --concrete-50:#EEF0F0;
@@ -973,6 +980,41 @@
 </footer>
 
 <script>
+  const trackSiteEvent = (eventName, parameters = {}) => {
+    if (typeof window.gtag !== 'function') return;
+    window.gtag('event', eventName, {
+      site_area: 'stanislav_ceilings',
+      ...parameters,
+    });
+  };
+
+  document.querySelectorAll('a[href^="tel:"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      trackSiteEvent('phone_click', {
+        link_text: link.textContent.trim(),
+        link_url: link.href,
+      });
+    });
+  });
+
+  document.querySelectorAll('a[href*="t.me/PStanislavV"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      trackSiteEvent('telegram_click', {
+        link_text: link.textContent.trim(),
+        link_url: link.href,
+      });
+    });
+  });
+
+  document.querySelectorAll('nav a[href^="#"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      trackSiteEvent('navigation_click', {
+        link_text: link.textContent.trim(),
+        section: link.getAttribute('href'),
+      });
+    });
+  });
+
   // Header music player
   const musicMixer = document.querySelector('.music-mixer');
   const musicToggle = document.getElementById('musicToggle');
@@ -1027,6 +1069,9 @@
     updateMusicButton();
     sendYouTubeCommand('setVolume', [Number(musicVolume?.value || 45)]);
     sendYouTubeCommand('playVideo');
+    trackSiteEvent('music_play', {
+      volume: Number(musicVolume?.value || 45),
+    });
     if (!youtubeReady) {
       window.setTimeout(() => sendYouTubeCommand('playVideo'), 450);
     }
@@ -1036,6 +1081,7 @@
     musicPlaying = false;
     updateMusicButton();
     sendYouTubeCommand('pauseVideo');
+    trackSiteEvent('music_pause');
   };
 
   const updateVolumeUi = () => {
@@ -1090,6 +1136,11 @@
       updateVolumeUi();
       sendYouTubeCommand('setVolume', [Number(musicVolume.value)]);
     });
+    musicVolume.addEventListener('change', () => {
+      trackSiteEvent('music_volume_change', {
+        volume: Number(musicVolume.value),
+      });
+    });
   }
 
   if (youtubeFrame) {
@@ -1103,6 +1154,7 @@
     musicConsentYes.addEventListener('click', () => {
       setMusicPromptAnswer('yes');
       closeMusicConsent();
+      trackSiteEvent('music_prompt_answer', { answer: 'yes' });
       playMusic();
     });
   }
@@ -1111,6 +1163,7 @@
     musicConsentNo.addEventListener('click', () => {
       setMusicPromptAnswer('no');
       closeMusicConsent();
+      trackSiteEvent('music_prompt_answer', { answer: 'no' });
     });
   }
 
@@ -1119,6 +1172,7 @@
       if (event.target === musicConsent) {
         setMusicPromptAnswer('no');
         closeMusicConsent();
+        trackSiteEvent('music_prompt_answer', { answer: 'dismiss' });
       }
     });
   }
@@ -1281,6 +1335,7 @@
     showUploadBtn.addEventListener('click', () => {
       const open = uploadPanel.classList.toggle('open');
       showUploadBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      trackSiteEvent(open ? 'photo_upload_panel_open' : 'photo_upload_panel_close');
       if (open) document.getElementById('uploadCode')?.focus();
     });
   }
@@ -1294,11 +1349,13 @@
 
       if (!code || !file) {
         setUploadStatus('Введіть код доступу й оберіть фото.', 'error');
+        trackSiteEvent('photo_upload_validation_error');
         return;
       }
 
       try {
         submitButton.disabled = true;
+        trackSiteEvent('photo_upload_submit');
         setUploadStatus('Готую фото до завантаження...');
         const image = await resizeImage(file);
         setUploadStatus('Завантажую фото на сайт...');
@@ -1313,9 +1370,13 @@
 
         uploadForm.reset();
         setUploadStatus('Фото додано. Воно зʼявиться після оновлення галереї.', 'success');
+        trackSiteEvent('photo_upload_success');
         setTimeout(loadGallery, 2500);
       } catch (error) {
         setUploadStatus(error.message || 'Не вдалося завантажити фото.', 'error');
+        trackSiteEvent('photo_upload_error', {
+          error_message: error.message || 'unknown',
+        });
       } finally {
         submitButton.disabled = false;
       }
