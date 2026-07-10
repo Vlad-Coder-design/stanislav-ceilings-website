@@ -434,7 +434,6 @@
     box-shadow:inset 0 0 0 1px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.2);
     transform-origin:50% 50%;
     transition:opacity .26s ease, transform .32s cubic-bezier(.18,.82,.22,1), box-shadow .32s ease, filter .32s ease;
-    animation:drop .55s cubic-bezier(.2,.8,.2,1) both;
     cursor:pointer;
   }
   .cell .tile::before{
@@ -461,10 +460,6 @@
     transform:scale(.96);
     filter:none;
     box-shadow:none;
-  }
-  @keyframes drop{
-    from{transform:translateY(-22px);opacity:0;}
-    to{transform:translateY(0);opacity:1;}
   }
   .sample-caption{
     font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--steel-400);
