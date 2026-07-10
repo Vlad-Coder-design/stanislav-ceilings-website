@@ -453,10 +453,10 @@
     background:var(--amber-500);
     box-shadow:0 0 12px 4px rgba(231,163,59,.45);
   }
-  .cell:hover .below, .cell:focus-within .below{
+  .cell:hover .below, .cell:focus-within .below, .cell.is-open .below{
     opacity:1;
   }
-  .cell:hover .tile, .cell:focus-within .tile{
+  .cell:hover .tile, .cell:focus-within .tile, .cell.is-open .tile{
     opacity:0;
     transform:scale(.96);
     filter:none;
@@ -1190,6 +1190,11 @@
       cell.innerHTML =
         `<div class="below">${ductSVG}</div>` +
         `<div class="tile" style="animation-delay:${i * 35}ms"></div>`;
+      cell.addEventListener('mouseenter', () => cell.classList.add('is-open'));
+      cell.addEventListener('mouseleave', () => cell.classList.remove('is-open'));
+      cell.addEventListener('focus', () => cell.classList.add('is-open'));
+      cell.addEventListener('blur', () => cell.classList.remove('is-open'));
+      cell.addEventListener('click', () => cell.classList.toggle('is-open'));
       grid.appendChild(cell);
     }
   }
